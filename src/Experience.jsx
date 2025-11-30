@@ -9,6 +9,8 @@ import {
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useThree } from "@react-three/fiber";
+import { Autofocus, EffectComposer } from "@react-three/postprocessing";
+import { button, folder, Leva, useControls } from "leva";
 // import { extend, useFrame } from "@react-three/fiber";
 
 export default function Experience() {
@@ -20,6 +22,7 @@ export default function Experience() {
   const [touched, setTouched] = useState(false);
   const [clicked, setClicked] = useState(false);
   const cubeRef = useRef();
+  const autofocusRef = useRef();
 
   // Use the useGSAP hook to scope animations and handle cleanup
   useGSAP(() => {
@@ -72,8 +75,46 @@ export default function Experience() {
     ); // Starts with the previous animation
   }, [camera]);
 
+  const { update, ...autofocusConfig } = useControls({
+    target: { value: [-1, 1, 0.6], optional: true, disabled: true },
+    mouse: false,
+    debug: { value: 0.02, min: 0, max: 0.15, optional: true },
+    smoothTime: { value: 0.5, min: 0, max: 1 },
+    manual: false,
+    "update (manual only)": button((get) => {
+      autofocusRef.current.update();
+    }),
+    DepthOfField: folder(
+      // https://pmndrs.github.io/postprocessing/public/docs/class/src/effects/DepthOfFieldEffect.js~DepthOfFieldEffect.html#instance-constructor-constructor
+      {
+        focusRange: { min: 0, max: 1, value: 0.95 },
+        bokehScale: { min: 0, max: 50, value: 4 },
+        width: {
+          value: 512,
+          min: 256,
+          max: 2048,
+          step: 256,
+          optional: true,
+          disabled: true,
+        },
+        height: {
+          value: 512,
+          min: 256,
+          max: 2048,
+          step: 256,
+          optional: true,
+          disabled: true,
+        },
+      },
+      { collapsed: true },
+    ),
+  });
+
+  const showLeva = new URLSearchParams(window.location.search).has("debug");
+
   return (
     <>
+      {showLeva ? null : <Leva hidden />}
       <color args={["#000000"]} attach="background" />
 
       <OrbitControls
@@ -144,13 +185,18 @@ export default function Experience() {
       </mesh>
 
       <Sparkles
-        size={6}
-        scale={[4, 2, 4]}
+        size={4}
+        scale={[6, 4, 6]}
         position-y={1}
         speed={0.4}
         count={40}
       />
       {/* </Center>*/}
+
+      {/* Depth of Field effect */}
+      <EffectComposer>
+        <Autofocus ref={autofocusRef} {...autofocusConfig} />
+      </EffectComposer>
     </>
   );
 }
