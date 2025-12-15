@@ -31,7 +31,7 @@ export default function App() {
     const newObjs = arr.map((f) => ({
       url: URL.createObjectURL(f),
       name: f.name,
-      isObject: true,
+      isObject: false,
     }));
     // append new uploads to existing tracks
     setTracks((prev) => [...prev, ...newObjs]);

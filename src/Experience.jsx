@@ -11,8 +11,7 @@ import gsap from "gsap";
 import { useThree } from "@react-three/fiber";
 import { Autofocus, EffectComposer } from "@react-three/postprocessing";
 import { button, folder, Leva, useControls } from "leva";
-import Track from "./components/Track";
-import Zoom from "./components/Zoom";
+import Tracks from "./components/Tracks";
 
 export default function Experience({
   allPlaying,
@@ -26,9 +25,9 @@ export default function Experience({
   tracks,
 }) {
   const { camera } = useThree();
-  const { nodes } = useGLTF("./model/boxed_exp.glb");
+  const { nodes } = useGLTF("./model/textured_bo_x.glb");
 
-  const bakedTexture = useTexture("./model/baked_exture.png");
+  const bakedTexture = useTexture("./model/baked_textur_e.png");
   bakedTexture.flipY = false;
   const [touched, setTouched] = useState(false);
   const [clicked, setClicked] = useState(false);
@@ -89,7 +88,7 @@ export default function Experience({
   const { update, ...autofocusConfig } = useControls({
     target: { value: [-1, 1, 0.6], optional: true, disabled: true },
     mouse: false,
-    debug: { value: 0.02, min: 0, max: 0.15, optional: true },
+    // debug: { value: 0.02, min: 0, max: 0.15, optional: true },
     smoothTime: { value: 0.5, min: 0, max: 1 },
     manual: false,
     "update (manual only)": button((get) => {
@@ -126,23 +125,23 @@ export default function Experience({
     <>
       {showLeva ? null : <Leva hidden />}
       <color args={["#000000"]} attach="background" />
-      <spotLight
+      {/* <spotLight
         position={[0, 4, -6]}
         angle={0.1}
         penumbra={1}
         castShadow
         shadow-mapSize={[2048, 2048]}
-      />
-      {/* <ambientLight intensity={1} />
-      <directionalLight castShadow position={[5, 10, 5]} intensity={1} />*/}
+      /> */}
+      {/* <ambientLight intensity={4} /> */}
+      {/* <directionalLight castShadow position={[5, 10, 5]} intensity={1} /> */}
 
       <OrbitControls
         makeDefault
         // Azimuthal angle (horizontal rotation) limits.
         // Here we are limiting rotation to 90 degrees left and right from the center.
         // To disable, comment out or set to Infinity.
-        minAzimuthAngle={-Math.PI / 6}
-        maxAzimuthAngle={Math.PI / 1.5}
+        minAzimuthAngle={-Math.PI}
+        // maxAzimuthAngle={Math.PI / 1.5}
         // Polar angle (vertical rotation) limits.
         // Here we are limiting vertical rotation from 45 degrees at the top
         // to 90 degrees at the bottom (ground level).
@@ -164,8 +163,8 @@ export default function Experience({
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.cube.geometry}
-        material={nodes.cube.material}
+        geometry={nodes.Cube.geometry}
+        material={nodes.Cube.material}
         rotation={[0, -0.449, 0]}
         position={[0, -0.0001, 0]}
       >
@@ -177,8 +176,8 @@ export default function Experience({
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.cube.geometry}
-        material={nodes.cube.material}
+        geometry={nodes.Cube.geometry}
+        material={nodes.Cube.material}
         rotation={[0, -0.449, 0]}
         scale={[1.005, 1.005, 1.005]}
         position={[0, -0.0001, 0]}
@@ -210,8 +209,8 @@ export default function Experience({
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.plane.geometry}
-        material={nodes.plane.material}
+        geometry={nodes.Plane.geometry}
+        material={nodes.Plane.material}
         position={[0, -0.0001, 0]}
       >
         <meshBasicMaterial
@@ -221,39 +220,18 @@ export default function Experience({
         {/* <meshStandardMaterial
           map={bakedTexture}
           // map-flipY={ false }
-        />*/}
+        /> */}
       </mesh>
 
-      {playUI && (
-        <>
-          <Suspense fallback={null}>
-            {tracks.map((t, i) => {
-              // scale and space increase by 0.4 per track
-              const scale = 1 + i * 10 + 20;
-              return (
-                <Track
-                  key={(t.url || t) + i}
-                  scale={scale}
-                  url={t.url}
-                  playing={playingStates[i]}
-                  onData={(avg, data) => {
-                    dataStoreRef.current[i] = { avg, data };
-                  }}
-                />
-              );
-            })}
-          </Suspense>
-          <Zoom selectedIndex={selectedZoom} dataStoreRef={dataStoreRef} />
-        </>
-      )}
+      <Tracks playUI={playUI} tracks={tracks} playingStates={playingStates} dataStoreRef={dataStoreRef} selectedZoom={selectedZoom} />
 
-      <Sparkles
+      {/* <Sparkles
         size={4}
         scale={[6, 4, 6]}
         position-y={1}
         speed={0.4}
         count={40}
-      />
+      /> */}
       {/* </Center>*/}
 
       {/* Depth of Field effect */}

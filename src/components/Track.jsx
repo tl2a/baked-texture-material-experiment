@@ -82,6 +82,7 @@ function Track({
       {...props}
     >
       <meshBasicMaterial toneMapped={false} />
+      {/* <meshStandardMaterial /> */}
     </instancedMesh>
   );
 }
