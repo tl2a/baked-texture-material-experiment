@@ -9,7 +9,7 @@ import {
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useThree } from "@react-three/fiber";
-import { Autofocus, EffectComposer } from "@react-three/postprocessing";
+import { Autofocus, Bloom, EffectComposer } from "@react-three/postprocessing";
 import { button, folder, Leva, useControls } from "leva";
 import Tracks from "./components/Tracks";
 
@@ -23,6 +23,7 @@ export default function Experience({
   setAllPlaying,
   setPlayingStates,
   tracks,
+  volume
 }) {
   const { camera } = useThree();
   const { nodes } = useGLTF("./model/textured_bo_x.glb");
@@ -57,7 +58,7 @@ export default function Experience({
           ease: "power2.inOut",
           onUpdate: () => camera.updateProjectionMatrix(),
         },
-        "<",
+        "<"
       ); // Starts with the previous animation
     }
   }, [clicked]); // Re-run animation when 'clicked' state changes
@@ -81,7 +82,7 @@ export default function Experience({
         ease: "power2.inOut",
         onUpdate: () => camera.updateProjectionMatrix(),
       },
-      "<",
+      "<"
     ); // Starts with the previous animation
   }, [camera]);
 
@@ -115,7 +116,7 @@ export default function Experience({
           disabled: true,
         },
       },
-      { collapsed: true },
+      { collapsed: true }
     ),
   });
 
@@ -223,7 +224,14 @@ export default function Experience({
         /> */}
       </mesh>
 
-      <Tracks playUI={playUI} tracks={tracks} playingStates={playingStates} dataStoreRef={dataStoreRef} selectedZoom={selectedZoom} />
+      <Tracks
+        playUI={playUI}
+        tracks={tracks}
+        playingStates={playingStates}
+        dataStoreRef={dataStoreRef}
+        selectedZoom={selectedZoom}
+        volume={volume}
+      />
 
       {/* <Sparkles
         size={4}
@@ -237,6 +245,7 @@ export default function Experience({
       {/* Depth of Field effect */}
       <EffectComposer>
         <Autofocus ref={autofocusRef} {...autofocusConfig} />
+        <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1} radius={0.6} />
       </EffectComposer>
     </>
   );

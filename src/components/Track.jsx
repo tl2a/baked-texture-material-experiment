@@ -12,6 +12,7 @@ function Track({
   height = 0.05,
   obj = new THREE.Object3D(),
   playing = true,
+  volume = 0.5,
   onData,
   ...props
 }) {
@@ -20,8 +21,13 @@ function Track({
   // integrates them with React suspense. You can use it as-is with or without r3f.
   const { gain, context, update, data } = suspend(
     () => createAudio(url),
-    [url],
+    [url]
   );
+
+  useEffect(() => {
+    gain.gain.value = volume;
+  }, [volume, gain]);
+
   useEffect(() => {
     // Connect the gain node, which plays the audio
     try {
@@ -45,7 +51,7 @@ function Track({
   const geometry = useMemo(
     () =>
       new THREE.BoxGeometry(width, height, 0.01).translate(0, height / 2, 0),
-    [width, height],
+    [width, height]
   );
 
   useFrame((state) => {

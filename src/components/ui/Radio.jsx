@@ -16,7 +16,7 @@ export default function Radio({ checked, onChange, name, label, className = '', 
       >
         {checked && <span className="w-2 h-2 rounded-full bg-white" />}
       </span>
-      <span className={labelClassName}>{label}</span>
+      <span className={labelClassName} title={label}>{label}</span>
     </label>
   );
 }
