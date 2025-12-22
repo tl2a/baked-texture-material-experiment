@@ -25,13 +25,10 @@ function Track({
   );
 
   useEffect(() => {
-    gain.gain.value = volume;
-  }, [volume, gain]);
-
-  useEffect(() => {
     // Connect the gain node, which plays the audio
     try {
       gain.connect(context.destination);
+      gain.gain.value = volume;
     } catch (e) {}
     // Disconnect it on unmount
     return () => {
@@ -40,6 +37,10 @@ function Track({
       } catch (e) {}
     };
   }, [gain, context]);
+
+  useEffect(() => {
+    gain.gain.value = volume;
+  }, [volume, gain]);
 
   // adjust gain when playing prop changes (mute/unmute to simulate pause)
   useEffect(() => {

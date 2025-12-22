@@ -9,7 +9,7 @@ function LineTrack({
   url,
   y = 2500,
   space = 2.5,
-  width = 0.01,
+  width = 0.1,
   height = 0.05,
   obj = new THREE.Object3D(),
   playing = true,
@@ -23,7 +23,7 @@ function LineTrack({
     [url]
   );
   const lineRef = useRef();
-  const shadowRef = useRef();
+  const ref = useRef();
 
   useEffect(() => {
     gain.gain.value = volume;
@@ -41,6 +41,12 @@ function LineTrack({
       } catch (e) {}
     };
   }, [gain, context]);
+
+  const geometry = useMemo(
+    () =>
+      new THREE.BoxGeometry(width, height, 0.01).translate(0, height / 2, 0),
+    [width, height]
+  );
 
   useEffect(() => {
     playing ? context.resume() : context.suspend();
@@ -61,6 +67,7 @@ function LineTrack({
 
   useFrame(() => {
     if (!lineRef.current) return;
+    if (!ref.current) return;
 
     // if not playing, freeze geometry (do nothing)
     if (!playing) return;
@@ -80,20 +87,26 @@ function LineTrack({
           radius * Math.sin(angle)
         )
       );
+
+      // Position the instances in a circle
+      obj.position.set(radius * Math.cos(angle), 0.1, radius * Math.sin(angle));
+      // Make the instances face the center
+      obj.lookAt(0, 0, 0);
+      obj.scale.set(1, (data[i] / y) * 180, 1);
+      obj.updateMatrix();
+      ref.current.setMatrixAt(i, obj.matrix);
     }
     const sampled = buildCurvePoints(raw, 8);
 
     const positions = sampled.flatMap((p) => [p.x, p.y, p.z]);
     lineRef.current.geometry.setPositions(positions);
 
-    // Update shadow line (flatten Y to -0.1)
-    if (shadowRef.current) {
-      const shadowPositions = sampled.flatMap((p) => [p.x, -0.1, p.z]);
-      shadowRef.current.geometry.setPositions(shadowPositions);
-    }
-
     if (lineRef.current.material)
       lineRef.current.material.color.setHSL((avg / 500) % 1, 0.75, 0.75);
+
+    if (ref.current.material)
+      ref.current.material.color.setHSL(avg / 500, 0.75, 0.75);
+    ref.current.instanceMatrix.needsUpdate = true;
   });
 
   // initial empty geometry
@@ -104,15 +117,27 @@ function LineTrack({
   }, []);
 
   return (
-    <Line
-      ref={lineRef}
-      points={initialPoints}
-      // color="red"
-      position={[0, 0.1, 0]}
-      lineWidth={2}
-      dashed={false}
-      {...props}
-    />
+    <group>
+      <Line
+        ref={lineRef}
+        points={initialPoints}
+        // color="red"
+        position={[0, 0.1, 0]}
+        lineWidth={2}
+        dashed={false}
+        {...props}
+      />
+      <instancedMesh
+        castShadow
+        ref={ref}
+        args={[geometry, null, data.length]}
+        geometry={geometry}
+        {...props}
+      >
+        <meshBasicMaterial toneMapped={false} />
+        {/* <meshStandardMaterial /> */}
+      </instancedMesh>
+    </group>
   );
 }
 

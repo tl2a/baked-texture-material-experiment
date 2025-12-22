@@ -12,9 +12,9 @@ export default function App() {
 
   // default demo tracks (can be appended to when user uploads files)
   const defaultTracks = [
-    { url: "/audio/synth.mp3", name: "synth.mp3", isObject: false },
-    { url: "/audio/snare.mp3", name: "snare.mp3", isObject: false },
-    { url: "/audio/drums.mp3", name: "drums.mp3", isObject: false },
+    { url: "/audio/synth.mp3", name: "synth.mp3", isObject: true },
+    { url: "/audio/snare.mp3", name: "snare.mp3", isObject: true },
+    { url: "/audio/drums.mp3", name: "drums.mp3", isObject: true },
   ];
   const [tracks, setTracks] = useState(defaultTracks);
   const [playingStates, setPlayingStates] = useState(() =>
@@ -36,7 +36,7 @@ export default function App() {
     const newObjs = arr.map((f) => ({
       url: URL.createObjectURL(f),
       name: f.name,
-      isObject: false,
+      isObject: true,
     }));
     // append new uploads to existing tracks
     setTracks(newObjs);

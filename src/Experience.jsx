@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
   OrbitControls,
@@ -26,9 +27,11 @@ export default function Experience({
   volume
 }) {
   const { camera } = useThree();
-  const { nodes } = useGLTF("./model/textured_bo_x.glb");
+  // const { nodes } = useGLTF("./model/speaker.glb");
+  const { nodes } = useGLTF("./model/textured_box.glb");
 
-  const bakedTexture = useTexture("./model/baked_textur_e.png");
+  // const bakedTexture = useTexture("./model/final_texture.png");
+  const bakedTexture = useTexture("./model/final_texture_vox.png");
   bakedTexture.flipY = false;
   const [touched, setTouched] = useState(false);
   const [clicked, setClicked] = useState(false);
@@ -141,8 +144,8 @@ export default function Experience({
         // Azimuthal angle (horizontal rotation) limits.
         // Here we are limiting rotation to 90 degrees left and right from the center.
         // To disable, comment out or set to Infinity.
-        minAzimuthAngle={-Math.PI}
-        // maxAzimuthAngle={Math.PI / 1.5}
+        minAzimuthAngle={-Math.PI / 6.5}
+        maxAzimuthAngle={Math.PI / 1.5}
         // Polar angle (vertical rotation) limits.
         // Here we are limiting vertical rotation from 45 degrees at the top
         // to 90 degrees at the bottom (ground level).
@@ -174,6 +177,36 @@ export default function Experience({
           // map-flipY={ false }
         />
       </mesh>
+
+      {/* <mesh
+        castShadow
+        receiveShadow
+        geometry={nodes.inside_net.geometry}
+        material={nodes.inside_net.material}
+        rotation={[0, -0.449, 0]}
+        position={[0, -0.0001, 0]}
+      >
+        <meshBasicMaterial
+          // map={bakedTexture}
+          // map-flipY={ false }
+          color="black"
+        />
+      </mesh> */}
+      
+      {/* <mesh
+        castShadow
+        receiveShadow
+        geometry={nodes.sound_net.geometry}
+        material={nodes.sound_net.material}
+        rotation={[0, -0.449, 0]}
+        position={[0, -0.0001, 0]}
+      >
+        <meshBasicMaterial
+          map={bakedTexture}
+          // map-flipY={ false }
+        />
+      </mesh> */}
+
       <mesh
         castShadow
         receiveShadow
@@ -210,8 +243,8 @@ export default function Experience({
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.Plane.geometry}
-        material={nodes.Plane.material}
+        geometry={nodes.Plane_cube.geometry}
+        material={nodes.Plane_cube.material}
         position={[0, -0.0001, 0]}
       >
         <meshBasicMaterial
