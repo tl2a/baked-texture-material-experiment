@@ -3,7 +3,7 @@ import Track from "./Track";
 import Zoom from "./Zoom";
 import LineTrack from "./LineTrack";
 
-function Tracks({ playUI, tracks, playingStates, dataStoreRef, selectedZoom, volume }) {
+function Tracks({ playUI, tracks, playingStates, dataStoreRef, selectedZoom, volume, style='bar', onEnded }) {
   return (
     <>
       {playUI && (
@@ -12,10 +12,9 @@ function Tracks({ playUI, tracks, playingStates, dataStoreRef, selectedZoom, vol
             {tracks.map((t, i) => {
               // scale and space increase by 0.4 per track
               const scale = 1 + i * 10 + 20;
-              const alter = (i + 1) % 2;
               return (
                 <Fragment key={(t.url || t) + i}>
-                  {alter ? (
+                  {style=='bar' ? (
                     <Track
                       scale={scale}
                       rotation={[0, i * 10, 0]}
@@ -25,6 +24,7 @@ function Tracks({ playUI, tracks, playingStates, dataStoreRef, selectedZoom, vol
                       onData={(avg, data) => {
                         dataStoreRef.current[i] = { avg, data };
                       }}
+                      onEnded={onEnded}
                     />
                   ) : (
                     <LineTrack
@@ -36,6 +36,7 @@ function Tracks({ playUI, tracks, playingStates, dataStoreRef, selectedZoom, vol
                       onData={(avg, data) => {
                         dataStoreRef.current[i] = { avg, data };
                       }}
+                      onEnded={onEnded}
                     />
                   )}
                 </Fragment>

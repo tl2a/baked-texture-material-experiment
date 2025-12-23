@@ -24,15 +24,21 @@ export default function Experience({
   setAllPlaying,
   setPlayingStates,
   tracks,
-  volume
+  volume,
+  modelVariation,
+  visualizerStyle,
+  onEnded,
 }) {
   const { camera } = useThree();
-  // const { nodes } = useGLTF("./model/speaker.glb");
-  const { nodes } = useGLTF("./model/textured_box.glb");
+  const { nodes: speaker } = useGLTF("./model/speaker.glb");
+  const { nodes: box } = useGLTF("./model/textured_box.glb");
 
-  // const bakedTexture = useTexture("./model/final_texture.png");
-  const bakedTexture = useTexture("./model/final_texture_vox.png");
-  bakedTexture.flipY = false;
+  const bakedTexture_speaker = useTexture("./model/final_texture.png");
+  const bakedTexture_box = useTexture("./model/final_texture_vox.png");
+
+  bakedTexture_speaker.flipY = false;
+  bakedTexture_box.flipY = false;
+
   const [touched, setTouched] = useState(false);
   const [clicked, setClicked] = useState(false);
   const cubeRef = useRef();
@@ -49,7 +55,7 @@ export default function Experience({
         duration: 1.2,
         x: 5,
         y: 4,
-        z: 4,
+        z: 8,
         ease: "power2.inOut",
       }).to(
         camera.rotation,
@@ -154,8 +160,9 @@ export default function Experience({
         maxPolarAngle={Math.PI / 2.5}
         // Zoom limits.
         // To disable, comment out or set min to 0 and max to Infinity.
-        minDistance={5} // How close you can zoom in.
+        minDistance={6} // How close you can zoom in.
         maxDistance={10} // How far you can zoom out.
+        enablePan={false}
       />
 
       {/* <mesh scale={ 1.5 }>
@@ -164,98 +171,150 @@ export default function Experience({
         </mesh> */}
 
       {/* <Center>*/}
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Cube.geometry}
-        material={nodes.Cube.material}
-        rotation={[0, -0.449, 0]}
-        position={[0, -0.0001, 0]}
-      >
-        <meshBasicMaterial
-          map={bakedTexture}
-          // map-flipY={ false }
-        />
-      </mesh>
 
-      {/* <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.inside_net.geometry}
-        material={nodes.inside_net.material}
-        rotation={[0, -0.449, 0]}
-        position={[0, -0.0001, 0]}
-      >
-        <meshBasicMaterial
-          // map={bakedTexture}
-          // map-flipY={ false }
-          color="black"
-        />
-      </mesh> */}
-      
-      {/* <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.sound_net.geometry}
-        material={nodes.sound_net.material}
-        rotation={[0, -0.449, 0]}
-        position={[0, -0.0001, 0]}
-      >
-        <meshBasicMaterial
-          map={bakedTexture}
-          // map-flipY={ false }
-        />
-      </mesh> */}
+      {modelVariation == "speaker" && (
+        <>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={speaker.body.geometry}
+            material={speaker.body.material}
+            rotation={[0, -0.449, 0]}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial
+              map={bakedTexture_speaker}
+              color="#efefef"
+              // map-flipY={ false }
+            />
+          </mesh>
 
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Cube.geometry}
-        material={nodes.Cube.material}
-        rotation={[0, -0.449, 0]}
-        scale={[1.005, 1.005, 1.005]}
-        position={[0, -0.0001, 0]}
-        onClick={() => {
-          const next = !allPlaying;
-          setClicked(true);
-          setPlayUI(true);
-          setAllPlaying(next);
-          setPlayingStates((s) => s.map(() => next));
-        }}
-        onPointerEnter={() => setTouched(true)}
-        onPointerLeave={() => {
-          setTouched(false);
-          setClicked(false);
-        }}
-        ref={cubeRef}
-      >
-        <meshBasicMaterial
-          transparent
-          color="blue"
-          opacity={touched ? 0.1 : 0.0}
-          // opacity={0.0}
-        />
-        {touched ? (
-          <Outlines thickness={0.08} opacity={0.6} color="blue" />
-        ) : null}
-      </mesh>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={speaker.inside_net.geometry}
+            material={speaker.inside_net.material}
+            rotation={[0, -0.449, 0]}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial
+              // map={bakedTexture}
+              // map-flipY={ false }
+              color="black"
+            />
+          </mesh>
 
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Plane_cube.geometry}
-        material={nodes.Plane_cube.material}
-        position={[0, -0.0001, 0]}
-      >
-        <meshBasicMaterial
-          map={bakedTexture}
-          // map-flipY={ false }
-        />
-        {/* <meshStandardMaterial
-          map={bakedTexture}
-          // map-flipY={ false }
-        /> */}
-      </mesh>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={speaker.sound_net.geometry}
+            material={speaker.sound_net.material}
+            rotation={[0, -0.449, 0]}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial map={bakedTexture_speaker} color="#efefef" />
+          </mesh>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={speaker.body.geometry}
+            material={speaker.body.material}
+            rotation={[0, -0.449, 0]}
+            scale={[1.005, 1.005, 1.005]}
+            position={[0, -0.0001, 0]}
+            onClick={() => {
+              const next = !allPlaying;
+              setClicked(true);
+              setPlayUI(true);
+              setAllPlaying(next);
+              setPlayingStates((s) => s.map(() => next));
+            }}
+            onPointerEnter={() => setTouched(true)}
+            onPointerLeave={() => {
+              setTouched(false);
+              setClicked(false);
+            }}
+            ref={cubeRef}
+          >
+            <meshBasicMaterial
+              transparent
+              color="blue"
+              opacity={touched ? 0.1 : 0.0}
+              // opacity={0.0}
+            />
+            {touched ? (
+              <Outlines thickness={0.08} opacity={0.6} color="blue" />
+            ) : null}
+          </mesh>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={speaker.Plane.geometry}
+            material={speaker.Plane.material}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial map={bakedTexture_speaker} color="#efefef" />
+          </mesh>
+        </>
+      )}
+
+      {modelVariation == "box" && (
+        <>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={box.Cube.geometry}
+            material={box.Cube.material}
+            rotation={[0, -0.449, 0]}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial map={bakedTexture_box} color="#efefef" />
+          </mesh>
+
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={box.Cube.geometry}
+            material={box.Cube.material}
+            rotation={[0, -0.449, 0]}
+            scale={[1.005, 1.005, 1.005]}
+            position={[0, -0.0001, 0]}
+            onClick={() => {
+              const next = !allPlaying;
+              setClicked(true);
+              setPlayUI(true);
+              setAllPlaying(next);
+              setPlayingStates((s) => s.map(() => next));
+            }}
+            onPointerEnter={() => setTouched(true)}
+            onPointerLeave={() => {
+              setTouched(false);
+              setClicked(false);
+            }}
+            ref={cubeRef}
+          >
+            <meshBasicMaterial
+              transparent
+              color="blue"
+              opacity={touched ? 0.1 : 0.0}
+              // opacity={0.0}
+            />
+            {touched ? (
+              <Outlines thickness={0.08} opacity={0.6} color="blue" />
+            ) : null}
+          </mesh>
+
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={box.Plane_cube.geometry}
+            material={box.Plane_cube.material}
+            position={[0, -0.0001, 0]}
+          >
+            <meshBasicMaterial map={bakedTexture_box} color="#efefef" />
+          </mesh>
+        </>
+      )}
 
       <Tracks
         playUI={playUI}
@@ -264,6 +323,8 @@ export default function Experience({
         dataStoreRef={dataStoreRef}
         selectedZoom={selectedZoom}
         volume={volume}
+        style={visualizerStyle}
+        onEnded={onEnded}
       />
 
       {/* <Sparkles
@@ -278,7 +339,12 @@ export default function Experience({
       {/* Depth of Field effect */}
       <EffectComposer>
         <Autofocus ref={autofocusRef} {...autofocusConfig} />
-        <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1} radius={0.6} />
+        <Bloom
+          luminanceThreshold={0.6}
+          mipmapBlur
+          intensity={0.5}
+          radius={0.6}
+        />
       </EffectComposer>
     </>
   );

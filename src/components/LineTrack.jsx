@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Line } from "@react-three/drei";
-import { suspend } from "suspend-react";
+import { suspend, clear } from "suspend-react";
 import createAudio from "../lib/CreateAudio";
 
 function LineTrack({
@@ -15,10 +15,11 @@ function LineTrack({
   playing = true,
   volume = 0.5,
   onData,
+  onEnded,
   scale = 1,
   ...props
 }) {
-  const { context, update, data, gain } = suspend(
+  const { context, update, data, gain, source } = suspend(
     () => createAudio(url),
     [url]
   );
@@ -58,6 +59,21 @@ function LineTrack({
     };
   }, [context]);
 
+  useEffect(() => {
+    if (source) {
+      if (onEnded) {
+        source.loop = false;
+        source.onended = () => {
+          clear([url]);
+          onEnded();
+        };
+      } else {
+        source.loop = true;
+        source.onended = null;
+      }
+    }
+  }, [source, onEnded]);
+
   // helper to build smoothed points using CatmullRomCurve3
   const buildCurvePoints = (rawPoints, samplesPerSegment = 6) => {
     const curve = new THREE.CatmullRomCurve3(rawPoints);
@@ -68,9 +84,6 @@ function LineTrack({
   useFrame(() => {
     if (!lineRef.current) return;
     if (!ref.current) return;
-
-    // if not playing, freeze geometry (do nothing)
-    if (!playing) return;
 
     const avg = update();
     if (onData) onData(avg, data);

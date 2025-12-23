@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { suspend } from "suspend-react";
+import { suspend, clear } from "suspend-react";
 import createAudio from "../lib/CreateAudio";
 
 function Track({
@@ -14,12 +14,13 @@ function Track({
   playing = true,
   volume = 0.5,
   onData,
+  onEnded,
   ...props
 }) {
   const ref = useRef();
   // suspend-react is the library that r3f uses internally for useLoader. It caches promises and
   // integrates them with React suspense. You can use it as-is with or without r3f.
-  const { gain, context, update, data } = suspend(
+  const { gain, context, update, data, source } = suspend(
     () => createAudio(url),
     [url]
   );
@@ -28,26 +29,38 @@ function Track({
     // Connect the gain node, which plays the audio
     try {
       gain.connect(context.destination);
-      gain.gain.value = volume;
     } catch (e) {}
     // Disconnect it on unmount
     return () => {
       try {
         gain.disconnect();
+        context.suspend();
       } catch (e) {}
     };
   }, [gain, context]);
 
   useEffect(() => {
-    gain.gain.value = volume;
-  }, [volume, gain]);
+    if (gain) gain.gain.value = volume;
+  }, [gain, volume]);
 
-  // adjust gain when playing prop changes (mute/unmute to simulate pause)
   useEffect(() => {
-    try {
-      if (gain && gain.gain) gain.gain.value = playing ? 1 : 0;
-    } catch (e) {}
-  }, [gain, playing]);
+    playing ? context.resume() : context.suspend();
+  }, [playing, context]);
+
+  useEffect(() => {
+    if (source) {
+      if (onEnded) {
+        source.loop = false;
+        source.onended = () => {
+          clear([url]);
+          onEnded();
+        };
+      } else {
+        source.loop = true;
+        source.onended = null;
+      }
+    }
+  }, [source, onEnded]);
 
   const geometry = useMemo(
     () =>
@@ -57,7 +70,6 @@ function Track({
 
   useFrame((state) => {
     if (!ref.current) return;
-    if (!playing) return; // freeze when not playing
     let avg = update();
     if (onData)
       try {
