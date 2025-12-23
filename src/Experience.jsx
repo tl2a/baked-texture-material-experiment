@@ -32,6 +32,7 @@ export default function Experience({
   const { camera } = useThree();
   const { nodes: speaker } = useGLTF("./model/speaker.glb");
   const { nodes: box } = useGLTF("./model/textured_box.glb");
+  const { nodes: play } = useGLTF("./model/play_icon.glb");
 
   const bakedTexture_speaker = useTexture("./model/final_texture.png");
   const bakedTexture_box = useTexture("./model/final_texture_vox.png");
@@ -171,6 +172,17 @@ export default function Experience({
         </mesh> */}
 
       {/* <Center>*/}
+
+      {!playingStates.some(item => item === true) ? <mesh
+        castShadow
+        receiveShadow
+        geometry={play.play_icon.geometry}
+        material={play.play_icon.material}
+        scale={[0.6,0.6,0.6]}
+        position={[0,1,0]}
+      >
+        <meshBasicMaterial color={touched ? "blue" : "#ffffff"} />
+      </mesh> : null}
 
       {modelVariation == "speaker" && (
         <>

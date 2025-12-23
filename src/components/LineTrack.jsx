@@ -105,7 +105,7 @@ function LineTrack({
       obj.position.set(radius * Math.cos(angle), 0.1, radius * Math.sin(angle));
       // Make the instances face the center
       obj.lookAt(0, 0, 0);
-      obj.scale.set(1, (data[i] / y) * 180, 1);
+      obj.scale.set(1, (data[i] / y) * 140, 1);
       obj.updateMatrix();
       ref.current.setMatrixAt(i, obj.matrix);
     }
