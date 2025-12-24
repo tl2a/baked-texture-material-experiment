@@ -18,6 +18,7 @@ import {
   Speaker,
   Activity,
   BarChart2,
+  Heart,
 } from "lucide-react";
 import LoadingScreen from "./components/LoadingScreen";
 import {
@@ -34,9 +35,9 @@ export default function App() {
 
   // default demo tracks (can be appended to when user uploads files)
   const defaultTracks = [
-    { url: "/audio/synth.mp3", name: "synth.mp3", isObject: true },
-    { url: "/audio/snare.mp3", name: "snare.mp3", isObject: true },
-    { url: "/audio/drums.mp3", name: "drums.mp3", isObject: true },
+    { url: "/audio/Guitar by Cymatics.wav", name: "Guitar by Cymatics", isObject: true },
+    { url: "/audio/Bass by Cymatics.wav", name: "Bass by Cymatics", isObject: true },
+    { url: "/audio/Key by Cymatics.wav", name: "Key by Cymatics", isObject: true },
   ];
   const [tracks, setTracks] = useState(defaultTracks);
   const [playingStates, setPlayingStates] = useState(() =>
@@ -131,7 +132,7 @@ export default function App() {
                   <div className="flex items-center gap-3">
                     <div className="px-2 py-1">
                       <div className="text-sm font-semibold">
-                        Upload or drop MP3s
+                        Upload or drop
                       </div>
                       <div className="text-xs text-slate-400">— audio</div>
                     </div>
@@ -358,7 +359,7 @@ export default function App() {
                     />
                     <div className="flex items-center justify-between text-[10px] text-slate-300 mt-1">
                       <span>0%</span>
-                      <span>50%</span>
+                      <span className="ps-3">50%</span>
                       <span>100%</span>
                     </div>
                   </div>
@@ -451,6 +452,11 @@ export default function App() {
               </div>
             </TabsContent>
           </Tabs>
+          <div className="mt-6 flex items-center justify-center gap-1.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+            <span>Made with</span>
+            <Heart size={10} className="fill-red-500/20 text-red-500" />
+            <span>by <span className="text-slate-400"><a href="https://tl2a.in" target="_blank">Arpan</a></span></span>
+          </div>
         </div>
       )}
 

@@ -162,7 +162,7 @@ export default function Experience({
         // Zoom limits.
         // To disable, comment out or set min to 0 and max to Infinity.
         minDistance={6} // How close you can zoom in.
-        maxDistance={10} // How far you can zoom out.
+        maxDistance={12} // How far you can zoom out.
         enablePan={false}
       />
 
